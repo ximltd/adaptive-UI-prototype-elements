@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>GoldUI : social news : family</title>
+<link href="HTML5_thrColFixHdr.css" rel="stylesheet" type="text/css">
+<!--[if lt IE 9]>
+<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+  <header>
+    <h1>Social : Family</h1>
+  </header>
+  <div class="sidebar1">
+    <aside>
+      <p><img src="#" name="profile" id="profile"></p>
+    </aside>
+    <!-- end .sidebar1 --></div>
+  <article class="content">
+    <section> &nbsp;<strong id="fromName">NAME</strong><p id="message">message</p></section>
+    <!-- end .content --></article>
+  <aside>
+    <p></p>
+  </aside>
+  <footer>
+     <input name="prev" type="button" id="prev" value="Prev" />
+     <input name="like" type="button" id="like" value="Like" />
+     <input name="next" type="button" id="next" value="Next" />
+  </footer>
+  <!-- end .container --></div>
+<script type="text/javascript">
+	// global variables
+  	var thisUser = 'GUI000001'; // ***WILL BE PASSED AS A GET VAR, also need FEED to be passed and its URL looked up in FEEDS within loadFeed.php****
+		thisFeed = 'friends'; // ** TEMP: IMPLEMENT AS A GET VAR ************************************************************************************
+		latestItem = 0, // current item
+	  	lastItem = 0, // last item read
+	  	ids = [],
+		images = [],
+		messages = [],
+		names = []; // holds all retrieved stories for this feed
+		
+  	function loadFeed() {
+	// IMPROVE: EITHER: load one article at a time AND/OR show a nice progress bar
+	// load data for all recent messages from server and set candle heights for bgd imgs
+		var cssObject = {}; // locally used to define background images
+		$.getJSON('loadFeed.php', {userId:thisUser},function(data) {
+			var items; 
+			$.each(data, function(i,newsitem) {
+				ids[i] = newsitem.id; // in order to lookup original object, like etc.
+				names[i] = newsitem.from.name;
+				images[i] = 'https://graph.facebook.com/' + newsitem.from.id + '/picture';
+				if (newsitem.message)
+					{messages[i] = newsitem.message;}
+				else if (newsitem.story)
+					{messages[i] = newsitem.story;}
+				else 
+					{messages[i] = " ";}
+			});
+			lastItem = ids.length-1;
+			showItem(lastItem);
+			
+		});
+	}
+	function showItem(i) { 
+	// IMPROVE THIS TO HANDLE DIFFERENT OBJECT TYPES (Pics, links, stories) VIA SWITCH
+	// COULD MAKE THIS "LIVE" ie get each object directly rather than downloading them all first.
+		latestItem = i; // update the global variable
+		$("#fromName").html(names[i]);
+		$("#message").html(messages[i]);
+		$("#profile").attr("src", images[i]);
+		// also update the 'like' button to 'unlike' if user has liked this item (should really lookup object and see if userid in likes)
+	}
+		function likeItem(i) {
+			jQuery.post( "https://graph.facebook.com/" + ids[i] + "/likes?access_token=AAAGotY5M4kYBAI8tENhHvZB3G1Kr9wNT7J4P40srKAlRTil6rzhAWrT4qH2AwkHyuwmrHuhP3hqwTnzv5PXs71eYOqKJCBDuXQAyTogZDZD", function(data) { 
+			// might need to supply access_key as data.
+			
+			// Use delete http method if already liked
+			/* $.ajax({
+   				url: "https://graph.facebook.com/" + ids[i] + "/likes",
+   				 type: 'DELETE',
+   				success: function( response ) {
+   			}
+			}); */
+			
+			$("#like").prop('value', 'Unlike');	 // confirm 'liked' - change the button to unlike
+			
+			// store in array if not checking in real time.
+			});
+	}
+	
+    loadFeed(); // load messages from db
+	$("#prev").click(function() { if (latestItem>0) {showItem(latestItem-1)} } );
+	$("#next").click(function() { if (latestItem<lastItem) {showItem(latestItem+1)} } );
+	$("#like").click(function() { likeItem(latestItem)} );
+</script>
+</body>
+</html>
