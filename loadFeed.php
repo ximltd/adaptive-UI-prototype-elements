@@ -12,8 +12,8 @@
 	require_once("fb.GoldUI.class.php");
 	  
 	// connect to xim's goldui database and grab the current user's friends' news feed...
- //   $feedUrl = "https://graph.facebook.com/me/home";
-$feedUrl = "https://api.facebook.com/method/fql.query?query=SELECT%20post_id%2C%20actor_id%2C%20target_id%2C%20message%20FROM%20stream%20WHERE%20filter_key%20in%20(SELECT%20filter_key%20FROM%20stream_filter%20WHERE%20uid%3Dme()%20AND%20type%3D'newsfeed')%20AND%20is_hidden%20%3D%200";
+    $feedUrl = "https://graph.facebook.com/me/home";
+// $feedUrl = "https://api.facebook.com/method/fql.query?query=SELECT%20post_id%2C%20actor_id%2C%20target_id%2C%20message%20FROM%20stream%20WHERE%20filter_key%20in%20(SELECT%20filter_key%20FROM%20stream_filter%20WHERE%20uid%3Dme()%20AND%20type%3D'newsfeed')%20AND%20is_hidden%20%3D%200";
 
     $myFeed = new Feed($guiId,$feedUrl);
  
